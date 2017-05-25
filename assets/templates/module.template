@@ -1,0 +1,27 @@
+import { NgModule }     from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule }  from '@angular/forms';
+import { NgaModule }    from '../../theme/nga.module';
+
+import { routing }      from './{selector}.routing';
+
+// This Module's Components
+import { {className} } from {quotes}./{selector}.component{quotes};
+
+@NgModule({
+    imports: [
+        CommonModule,
+        FormsModule,
+        NgaModule,
+        routing
+    ],
+    declarations: [
+        {className}
+    ],
+    exports: [
+        {className}
+    ]
+})
+export class {className}Module {
+
+}
