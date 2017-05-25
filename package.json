@@ -54,7 +54,7 @@
     "commands": [
       {
         "command": "extension.generateAngular2Files",
-        "title": "New Angular2 Component"
+        "title": "New Angular2 Files"
       }
     ],
     "menus": {
