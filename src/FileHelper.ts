@@ -36,8 +36,11 @@ export class FileHelper {
         if (config.template) {
             templateFileName = this.resolveWorkspaceRoot(config.template);
         }
-
-        let componentContent = this.replaceContentItems(templateFileName, componentName, globalConfig, configF);
+        
+        let componentContent = "";
+        if( fs.exists(templateFileName)){
+            componentContent = this.replaceContentItems(templateFileName, componentName, globalConfig, configF);
+        }
 
         let filename = '';
         switch(itemName){
