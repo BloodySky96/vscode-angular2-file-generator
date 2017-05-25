@@ -16,9 +16,10 @@ This will generate files listed below :
 
 ## Usage
 Operation is same as Great Extension vscode-angular2-component-generator / dbaikov 
-        you can check orginal extension here : https://marketplace.visualstudio.com/items?itemName=dbaikov.vscode-angular2-component-generator
+- you can check orginal extension here : https://marketplace.visualstudio.com/items?itemName=dbaikov.vscode-angular2-component-generator
 
 Although it is good to use, to simplify my works with ng2-admin I add some files.
+
 To avoid conflicts with based extension, I changed control name to 'New Angular2 Files'.
 
 
