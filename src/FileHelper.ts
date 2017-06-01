@@ -38,7 +38,8 @@ export class FileHelper {
         }
         
         let componentContent = "";
-        if( fs.exists(templateFileName)){
+
+        if(templateFileName){
             componentContent = this.replaceContentItems(templateFileName, componentName, globalConfig, configF);
         }
 
