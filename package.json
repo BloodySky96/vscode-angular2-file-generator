@@ -2,7 +2,7 @@
     "name": "vscode-angular2-file-generator",
     "displayName": "Angular2 File Generator",
     "description": "Generates angular2 component files (html, css, typescript -> template, stylesheet, component.ts + module.ts + routing.ts + index.ts)",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "bloodysky96",
     "author": {
         "name": "Jack Lee",
