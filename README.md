@@ -88,6 +88,9 @@ Use the "template" key to override default templates for the extension
 
 ### Change Log
 
+#### 0.0.3 (2017-06-1)
+- generated file is empty issue fixed
+
 #### 0.0.2 (2017-05-25)
 - adding any items to files will be generated
     - ex. service : {"create": true,"extension": "ts"} . --> givenname.service.ts 
