@@ -1,4 +1,5 @@
 export interface GlobalConfig {
     quotes?: string,
-    generateFolder?: boolean
+    generateFolder?: boolean,
+    automodify?: boolean
 }

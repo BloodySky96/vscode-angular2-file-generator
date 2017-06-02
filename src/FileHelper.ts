@@ -18,6 +18,8 @@ export class FileHelper {
     private static createFile = <(file: string, data: string) => Observable<{}>>Observable.bindNodeCallback(fse.outputFile);
     private static assetRootDir: string = path.join(__dirname, '../../assets');
 
+    
+
     public static createAllItems(componentDir: string, componentName: string, globalConfig: GlobalConfig, config: FileConfig): Observable<string[]> {
 
         let arrItems: any = [];
@@ -82,7 +84,7 @@ export class FileHelper {
 
     public static createComponentDir(uri: any, componentName: string, globalConfig: GlobalConfig): string {
         let contextMenuSourcePath;
-
+        
         if (uri && fs.lstatSync(uri.fsPath).isDirectory()) {
             contextMenuSourcePath = uri.fsPath;
         } else if (uri) {
@@ -95,10 +97,92 @@ export class FileHelper {
         if(globalConfig.generateFolder) {
             componentDir = `${contextMenuSourcePath}/${componentName}`;
             fse.mkdirsSync(componentDir);
+            console.log(globalConfig.automodify);
+            if(globalConfig.automodify){
+                this.modifyModule(contextMenuSourcePath, componentName);
+                this.modifyRoute(contextMenuSourcePath, componentName);
+            }
         }
 
         return componentDir;
     }
+
+    public static getlastStringBlocks(targetString: string, beginString: string, endString: string): string{
+        var findString = targetString.substring(targetString.lastIndexOf(beginString), targetString.length);
+        return findString.substring(0, findString.indexOf(endString)+1);
+    }
+
+    public static getFirstStringBlocks(targetString: string, beginString: string, endString: string){
+        var findString = targetString.substring(targetString.indexOf(beginString), targetString.length);
+        return findString.substring(0, findString.indexOf(endString)+1);
+    }
+
+    public static getReplacableStrings(TargetString: string): string{
+        var dItems = this.getFirstStringBlocks(TargetString, '[',']');
+        return TargetString.replace(dItems, dItems.replace(/\s/g,''));
+    }
+
+    private static modifyModule(contextMenuSourcePath: any, componentName: string){
+
+        // check module file exists in target folder 
+        var tempcon = contextMenuSourcePath.split('/');
+        var mdFileName = contextMenuSourcePath + '/' + tempcon[tempcon.length-1] + '.module.ts';
+        if(fs.existsSync(mdFileName)){
+
+            var strfile = fs.readFileSync(mdFileName).toString();
+            let className = changeCase.pascalCase(componentName);
+
+            var lastimportstring = this.getlastStringBlocks(strfile, 'import ', ';');
+            var importString = `import { ${className} } from './${componentName}/${componentName}.component';`;
+            strfile = strfile.replace(lastimportstring, lastimportstring + '\n' + importString);
+
+            var Replacables = this.getFirstStringBlocks(strfile, 'declarations',']');            
+            var resultReplacable = this.getReplacableStrings(Replacables)
+                                                    .replace(']', `,${className}]`)
+                                                    .replace('[', '[ \n \t\t')
+                                                    .replace(/,/g, ', \n \t\t')
+                                                    .replace(']', '\n \t]'); 
+
+            fs.writeFileSync(mdFileName, strfile.replace(Replacables, resultReplacable)) ;
+
+        }
+    }
+
+    private static modifyRoute(contextMenuSourcePath: any, componentName: string){
+
+        // check router file exists in target folder 
+        var tempcon = contextMenuSourcePath.split('/');
+        var rtFileName = contextMenuSourcePath + '/' + tempcon[tempcon.length-1] + '.routing.ts';
+
+        // if it exists read file and add child routes 
+        if(fs.existsSync(rtFileName)){
+            var strfile = fs.readFileSync(rtFileName).toString();
+            let className = changeCase.pascalCase(componentName);
+
+            // add import component to router
+            var importString = `import { ${className} } from './${componentName}/${componentName}.component'`;
+            strfile = strfile.replace(`@angular/router';`, `@angular/router';` + '\n' + importString + ';');
+
+            // add route of new component
+            var Replacables = this.getFirstStringBlocks(strfile, 'children',']');            
+            var resultReplacable = this.getReplacableStrings(Replacables)
+                                                    .replace(']', `{path : ` + `'${componentName}'` + `, component: ` + `${className}`+ ` }]`)                                                    
+                                                    .replace(/\s/g,'')
+                                                    .replace(/}{/g, '},{')
+                                                    .replace(/},{/g, '},\n \t\t\t\t{')
+                                                    .replace('}]', '}\n\t\t]')
+                                                    .replace('[', '[ \n \t\t\t\t')
+                                                    .replace(/{/g, '{ ')
+                                                    .replace(/:/g, ' : ')
+                                                    .replace(/}/g, ' }')
+                                                    .replace(/,/g, ', ');
+
+            fs.writeFileSync(rtFileName, strfile.replace(Replacables, resultReplacable).replace(': ModuleWithProviders', ' ')) ;
+        }
+        
+
+    }
+
 
     public static getDefaultConfig(): any {
         let content = fs.readFileSync( this.assetRootDir + '/config/config.json' ).toString();

@@ -43,7 +43,8 @@ Use the "template" key to override default templates for the extension
 {
     "global": {
         "quotes": "single", // or "double",
-        "generateFolder": true, // or false
+        "generateFolder": true, // or false,
+        "automodify": true      // or false   added v0.0.4
     },
     "files": {
         "component": {
@@ -87,6 +88,12 @@ Use the "template" key to override default templates for the extension
  
 
 ### Change Log
+
+#### 0.0.4 (2017-06-2)
+- Modify module.ts, routing.ts when generating sub folder of base folder which has module and routing
+    - importing sub component class and make children object with what you named for new folder
+    - remove ModuleWithProviders from bottom of routing.ts file
+    - default setting is true for this action if you do not want, change automodify to false which added from this version
 
 #### 0.0.3 (2017-06-1)
 - generated file is empty issue fixed
