@@ -41,7 +41,10 @@ export class FileHelper {
         
         let componentContent = "";
 
-        if(templateFileName){
+        console.log(templateFileName);
+        console.log(fs.existsSync(templateFileName));
+
+        if(fs.existsSync(templateFileName)){
             componentContent = this.replaceContentItems(templateFileName, componentName, globalConfig, configF);
         }
 
