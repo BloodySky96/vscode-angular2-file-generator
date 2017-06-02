@@ -92,6 +92,8 @@ Use the "template" key to override default templates for the extension
  
 
 ### Change Log
+#### 0.0.5 (2017-06-2)
+- loadchildren issue fixed
 
 #### 0.0.4 (2017-06-2)
 - Modify module.ts, routing.ts when generating sub folder of base folder which has module and routing
