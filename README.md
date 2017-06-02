@@ -98,6 +98,8 @@ Use the "template" key to override default templates for the extension
     - importing sub component class and make children object with what you named for new folder
     - remove ModuleWithProviders from bottom of routing.ts file
     - default setting is true for this action if you do not want, change automodify to false which added from this version
+    - prevent multiple import of same name for creating folders with same names even delete and recreate.
+    - can not create folder with the same name if it already exists in the folder
     - generate without template module bug fixed
 
 #### 0.0.3 (2017-06-1)

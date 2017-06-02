@@ -41,9 +41,6 @@ export class FileHelper {
         
         let componentContent = "";
 
-        console.log(templateFileName);
-        console.log(fs.existsSync(templateFileName));
-
         if(fs.existsSync(templateFileName)){
             componentContent = this.replaceContentItems(templateFileName, componentName, globalConfig, configF);
         }
@@ -99,11 +96,15 @@ export class FileHelper {
         let componentDir = `${contextMenuSourcePath}`;
         if(globalConfig.generateFolder) {
             componentDir = `${contextMenuSourcePath}/${componentName}`;
-            fse.mkdirsSync(componentDir);
-            console.log(globalConfig.automodify);
-            if(globalConfig.automodify){
-                this.modifyModule(contextMenuSourcePath, componentName);
-                this.modifyRoute(contextMenuSourcePath, componentName);
+
+            if(!fse.existsSync(componentDir)){
+                fse.mkdirsSync(componentDir);
+                if(globalConfig.automodify){
+                    this.modifyModule(contextMenuSourcePath, componentName);
+                    this.modifyRoute(contextMenuSourcePath, componentName);
+                }
+            }else{
+                componentDir = 'duple'
             }
         }
 
@@ -137,17 +138,20 @@ export class FileHelper {
 
             var lastimportstring = this.getlastStringBlocks(strfile, 'import ', ';');
             var importString = `import { ${className} } from './${componentName}/${componentName}.component';`;
-            strfile = strfile.replace(lastimportstring, lastimportstring + '\n' + importString);
 
-            var Replacables = this.getFirstStringBlocks(strfile, 'declarations',']');            
-            var resultReplacable = this.getReplacableStrings(Replacables)
-                                                    .replace(']', `,${className}]`)
-                                                    .replace('[', '[ \n \t\t')
-                                                    .replace(/,/g, ', \n \t\t')
-                                                    .replace(']', '\n \t]'); 
+            // if import exists do not append 
+            if(!strfile.includes(importString)){
+                strfile = strfile.replace(lastimportstring, lastimportstring + '\n' + importString);
 
-            fs.writeFileSync(mdFileName, strfile.replace(Replacables, resultReplacable)) ;
+                var Replacables = this.getFirstStringBlocks(strfile, 'declarations',']');            
+                var resultReplacable = this.getReplacableStrings(Replacables)
+                                                        .replace(']', `,${className}]`)
+                                                        .replace('[', '[ \n \t\t')
+                                                        .replace(/,/g, ', \n \t\t')
+                                                        .replace(']', '\n \t]'); 
 
+                fs.writeFileSync(mdFileName, strfile.replace(Replacables, resultReplacable)) ;
+            }
         }
     }
 
@@ -164,23 +168,28 @@ export class FileHelper {
 
             // add import component to router
             var importString = `import { ${className} } from './${componentName}/${componentName}.component'`;
-            strfile = strfile.replace(`@angular/router';`, `@angular/router';` + '\n' + importString + ';');
+            
+            // if import exists do not append 
+            if(!strfile.includes(importString)){
 
-            // add route of new component
-            var Replacables = this.getFirstStringBlocks(strfile, 'children',']');            
-            var resultReplacable = this.getReplacableStrings(Replacables)
-                                                    .replace(']', `{path : ` + `'${componentName}'` + `, component: ` + `${className}`+ ` }]`)                                                    
-                                                    .replace(/\s/g,'')
-                                                    .replace(/}{/g, '},{')
-                                                    .replace(/},{/g, '},\n \t\t\t\t{')
-                                                    .replace('}]', '}\n\t\t]')
-                                                    .replace('[', '[ \n \t\t\t\t')
-                                                    .replace(/{/g, '{ ')
-                                                    .replace(/:/g, ' : ')
-                                                    .replace(/}/g, ' }')
-                                                    .replace(/,/g, ', ');
+                strfile = strfile.replace(`@angular/router';`, `@angular/router';` + '\n' + importString + ';');
 
-            fs.writeFileSync(rtFileName, strfile.replace(Replacables, resultReplacable).replace(': ModuleWithProviders', ' ')) ;
+                // add route of new component
+                var Replacables = this.getFirstStringBlocks(strfile, 'children',']');            
+                var resultReplacable = this.getReplacableStrings(Replacables)
+                                                        .replace(']', `{path : ` + `'${componentName}'` + `, component: ` + `${className}`+ ` }]`)                                                    
+                                                        .replace(/\s/g,'')
+                                                        .replace(/}{/g, '},{')
+                                                        .replace(/},{/g, '},\n \t\t\t\t{')
+                                                        .replace('}]', '}\n\t\t]')
+                                                        .replace('[', '[ \n \t\t\t\t')
+                                                        .replace(/{/g, '{ ')
+                                                        .replace(/:/g, ' : ')
+                                                        .replace(/}/g, ' }')
+                                                        .replace(/,/g, ', ');
+
+                fs.writeFileSync(rtFileName, strfile.replace(Replacables, resultReplacable).replace(': ModuleWithProviders', ' ')) ;
+            }
         }
         
 

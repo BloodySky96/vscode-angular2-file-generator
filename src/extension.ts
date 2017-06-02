@@ -44,7 +44,9 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                     let componentName = changeCase.paramCase(val);
                     let componentDir = FileHelper.createComponentDir(uri, componentName, config.global);
-                    
+                    if(componentDir == 'duple'){
+                        throw new Error('existing folder can not be replaced, please choose new name for files.')
+                    };
                     return FileHelper.createAllItems(componentDir, componentName, config.global, config.files);
                 }
             )
