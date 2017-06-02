@@ -172,12 +172,17 @@ export class FileHelper {
             // if import exists do not append 
             if(!strfile.includes(importString)){
 
-                strfile = strfile.replace(`@angular/router';`, `@angular/router';` + '\n' + importString + ';');
 
+                let replaceItem = `{path : ` + `'${componentName}'` + `, component: ` + `${className}`+ ` }]`;
+
+
+                if(strfile.includes('loadChildren')){
+                    replaceItem = `{ path: '${componentName}', loadChildren: './${componentName}/${componentName}.module#${className}Module' }]`
+                }
                 // add route of new component
                 var Replacables = this.getFirstStringBlocks(strfile, 'children',']');            
                 var resultReplacable = this.getReplacableStrings(Replacables)
-                                                        .replace(']', `{path : ` + `'${componentName}'` + `, component: ` + `${className}`+ ` }]`)                                                    
+                                                        .replace(']', replaceItem)                                                    
                                                         .replace(/\s/g,'')
                                                         .replace(/}{/g, '},{')
                                                         .replace(/},{/g, '},\n \t\t\t\t{')
@@ -187,8 +192,14 @@ export class FileHelper {
                                                         .replace(/:/g, ' : ')
                                                         .replace(/}/g, ' }')
                                                         .replace(/,/g, ', ');
+                if(strfile.includes('loadChildren')){
+                    fs.writeFileSync(rtFileName, strfile.replace(Replacables, resultReplacable)) ;
+                }else{
+                    strfile = strfile.replace(`@angular/router';`, `@angular/router';` + '\n' + importString + ';');
+                    fs.writeFileSync(rtFileName, strfile.replace(Replacables, resultReplacable).replace(': ModuleWithProviders', ' ')) ;
+                }
 
-                fs.writeFileSync(rtFileName, strfile.replace(Replacables, resultReplacable).replace(': ModuleWithProviders', ' ')) ;
+
             }
         }
         
